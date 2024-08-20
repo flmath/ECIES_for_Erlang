@@ -1,0 +1,11 @@
+asn1 = SEQUENCE:subjectPublicKeyInfo
+
+[subjectPublicKeyInfo]
+algorithm = SEQUENCE:algorithmIdentifier
+subjectPublicKey = FORMAT:HEX,BITSTR:a55e59dde0cf8ef36803846fdaeeb8d3d3a25c498b57a45527f67c0bbf965a5b5e46a7d1d613af37d995f24b6b749dac5dd374a83426d82a738d750f11ca3123
+
+
+
+[algorithmIdentifier]
+algorithm = OID:1.2.840.10045.2.1  
+parameters = OID:1.3.36.3.3.2.8.1.1.7

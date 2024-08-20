@@ -1,0 +1,18 @@
+{application, tracing_experiments,
+ [{description, "An example apllication with sensitive logs enrypted with public key"},
+  {vsn, "1.0.0"},
+  {registered, [tracing_experiments]},
+  {mod, {tracing_experiments_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+    sasl,
+    crypto
+   ]},
+  {env,[{cert_dir, "certs"}]},
+  {modules, [tracing_experiments,
+	     tracing_experiments_sup,
+	     tracing_experiments_app]},
+  {licenses, ["Apache 2.0"]},
+  {links, []}
+ ]}.
