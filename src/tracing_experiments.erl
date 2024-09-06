@@ -54,8 +54,9 @@ stop() ->
 %%--------------------------------------------------------------------
 init([]) ->
     PUK = read_public_binary_key(),
-    {GenPubKey, Secret} = generate_ephermal_secret(PUK),   
-    {ok, light_state, #{iterator=>0, publicKey => PUK, crypto => {GenPubKey, Secret}}}.
+    {GenPubKey, Secret, Salt} = generate_ephermal_secret(PUK),   
+    {ok, light_state, #{iterator=>0, publicKey => PUK,
+			crypto => {GenPubKey, Secret, Salt}}}.
 
 callback_mode() ->
     state_functions.
@@ -66,8 +67,8 @@ light_state(cast, switch_state, #{crypto := Crypto}=State) ->
     traced_function(enter_encrypted_state, Number, Crypto),
     {next_state, encrypted_state, State#{iterator:=Number+1}, ?EncStateWindowLength};
 light_state(cast, regenerate_key, #{publicKey := PUK}=State) ->
-    {GenPubKey, Secret} = generate_ephermal_secret(PUK),
-    {keep_state, State#{crypto => {GenPubKey, Secret}}};
+    {GenPubKey, Secret, Salt} = generate_ephermal_secret(PUK),
+    {keep_state, State#{crypto => {GenPubKey, Secret, Salt}}};
 light_state(timeout, _Event, State) ->   
     #{iterator:=Number} = State,
     traced_function(ignore_timeout, Number, not_important),
@@ -81,8 +82,8 @@ encrypted_state(cast, switch_state, #{crypto := Crypto}=State) ->
     traced_function(enter_light_state, Number, Crypto),
     {next_state, light_state, State#{iterator:=Number+1}};
 encrypted_state(cast, regenerate_key,  #{publicKey := PUK} = State) ->
-    {GenPubKey, Secret} = generate_ephermal_secret(PUK),
-    {keep_state, State#{crypto => {GenPubKey, Secret}}, ?EncStateWindowLength};
+    {GenPubKey, Secret, Salt} = generate_ephermal_secret(PUK),
+    {keep_state, State#{crypto => {GenPubKey, Secret, Salt}}, ?EncStateWindowLength};
 encrypted_state(timeout, _Event, #{crypto := Crypto} = State) ->   
     #{iterator:=Number} = State,
     traced_function(keep_encrypted_state, Number, Crypto),
@@ -102,11 +103,11 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-traced_function(EncryptedState, Number,  {GenPubKey, Secret}) when 
+traced_function(EncryptedState, Number,  {GenPubKey, Secret, Salt}) when 
       EncryptedState == keep_encrypted_state; 
       EncryptedState == enter_encrypted_state ->
     Msg = atom_to_list(EncryptedState) ++ "sensitive state " ++ integer_to_list(Number),
-    EncryptedMsg = encrypt_line(Msg, {GenPubKey, Secret}),
+    EncryptedMsg = encrypt_line(Msg, {GenPubKey, Secret, Salt}),
     logger:notice("unecrypted "++ Msg),
     logger:notice(EncryptedMsg);
 
@@ -132,15 +133,20 @@ read_public_binary_key(Path)->
 generate_ephermal_secret({PubKeyRec,CN})->
     {GenPubKey, GenPrivateKey} = crypto:generate_key(ecdh, map_curve_name(CN)),
     Secret = crypto:compute_key(ecdh, PubKeyRec, GenPrivateKey, map_curve_name(CN)),
+    %% io:format("Shared secret computed: ~p~n", [Secret]),
+    Salt = crypto:strong_rand_bytes(8), 
+    SecretPbkdf = crypto:pbkdf2_hmac(sha256, Secret, Salt,1,32),
+    %% io:format("Shared obkdf secret computed: ~p~n", [SecretPbkdf]),
     %% save as hex remove 0x04 wchich means uncompressed for EC key binary 
     GenPubKeyHex = tl(tl(bin_to_hex(GenPubKey))),
-    {GenPubKeyHex, Secret}.
+    HexSalt=bin_to_hex(Salt),
+    {GenPubKeyHex, SecretPbkdf, HexSalt}.
 
-encrypt_line(Msg, {GenPubKey, Secret}) ->
-    IV = crypto:strong_rand_bytes(16),
+encrypt_line(Msg, {GenPubKey, Secret, HexSalt}) ->
+    IV = crypto:strong_rand_bytes(16),    
     HexIV = bin_to_hex(IV),
     Enc =  base64:encode(crypto:crypto_one_time(aes_256_ctr, Secret, IV, Msg, true)),
-    lists:append(["encrypted ",  GenPubKey," ",HexIV," ",  binary_to_list(Enc)]).
+    lists:append(["encrypted ",  GenPubKey," ",HexSalt," ",HexIV," ",  binary_to_list(Enc)]).
 
 bin_to_hex(Val) ->
     string:lowercase(
