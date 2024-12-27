@@ -61,7 +61,7 @@ The unencrypted and encrypted records will be added to logs/erlang.log
 -----
     cat logs/erlang.log
 
-2024-08-20T07:49:27.333830+02:00 notice: $\color{#58A6FF}\textsf{unecrypted enter_encrypted_state sensitive state 0}$
+2024-08-20T07:49:27.333830+02:00 notice: $\color{#58A6FF}\textsf{unecrypted enter\_encrypted\_state sensitive state 0}$
 2024-08-20T07:49:27.336480+02:00 notice: encrypted 652ec1980fbb9afed915fd9075f3fb95b67ea5187c03a62a5139edbabc384993027a454e48ac0e4df248deeb685852ff11144901197d26df0e93bbc1ec5763ce b0bd2dfe4391db1102ef09b346e0e70b e7NgjqwZnmFEiYiN7EF0AMZiGFub/SKP0Jikiaus3Mf7Q00i/c4=
 
 Now the logs can be decrypted for record marked as encrypted and compared.
