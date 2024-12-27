@@ -61,17 +61,17 @@ The unencrypted and encrypted records will be added to logs/erlang.log
 -----
     cat logs/erlang.log
 
-2024-08-20T07:49:27.333830+02:00 notice: unecrypted enter_encrypted_statesensitive state 0
+2024-08-20T07:49:27.333830+02:00 notice: ![#c5f015](unecrypted enter_encrypted_statesensitive state 0) `#c5f015`
 2024-08-20T07:49:27.336480+02:00 notice: encrypted 652ec1980fbb9afed915fd9075f3fb95b67ea5187c03a62a5139edbabc384993027a454e48ac0e4df248deeb685852ff11144901197d26df0e93bbc1ec5763ce b0bd2dfe4391db1102ef09b346e0e70b e7NgjqwZnmFEiYiN7EF0AMZiGFub/SKP0Jikiaus3Mf7Q00i/c4=
 
 Now the logs can be decrypted for record marked as encrypted and compared.
 -----
     scripts/decrypt_logs.sh
     
-2024-08-20T07:49:27.333830+02:00 notice: unencrypted enter_encrypted_state sensitive state 0
+2024-08-20T07:49:27.333830+02:00 notice: ![#c5f015](unecrypted enter_encrypted_statesensitive state 0)
 File created: isolated/decryption_keys/652ec1980fbb9afed915fd9075f3fb95b67ea5187c03a62a5139edbabc384993027a454e48ac0e4df248deeb685852ff11144901197d26df0e93bbc1ec5763ce.sharedhex
 
-14c0081fc339b8ced2099716e35663407b3699f5108fce60977ad1c2183f4e982024-08-20T07:49:27.336480+02:00 notice: decrypted enter_encrypted_state sensitive state 0
+14c0081fc339b8ced2099716e35663407b3699f5108fce60977ad1c2183f4e982024-08-20T07:49:27.336480+02:00 notice: ![#1530f5](decrypted enter_encrypted_state sensitive state 0)
 
 
 -----
