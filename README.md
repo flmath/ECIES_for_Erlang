@@ -11,7 +11,7 @@ Unfortunatelly [public_key:encrypt_private/2](https://www.erlang.org/doc/apps/pu
 
 ## Solution:
 
-We create a public key cryptosystem. The public key is used by the server to encrypt sensitive records. The private key is stored in air-gapped server in case we need to read those data from the logs. We create our own Elliptic Curve Integrated Encryption Scheme (ECIES), based on [this notebook](https://flmath.github.io/posts/jupyter/AsymetricCrypto).
+We create a public key cryptosystem. The public key is used by the server to encrypt sensitive records. The private key is stored in air-gapped server in case we need to read those data from the logs. We create our own Elliptic Curve Integrated Encryption Scheme (ECIES), based on [this notebook](https://flmath.github.io/posts/jupyter/asymetric_crypto).
 
 ## Steps:
 
@@ -66,6 +66,7 @@ cat logs/erlang.log
 
 Now the logs can be decrypted for record marked as encrypted and compared.
 -----
+> scripts/decrypt_logs.sh
 
 2024-08-20T07:49:27.333830+02:00 notice: unencrypted enter_encrypted_state sensitive state 0
 File created: isolated/decryption_keys/652ec1980fbb9afed915fd9075f3fb95b67ea5187c03a62a5139edbabc384993027a454e48ac0e4df248deeb685852ff11144901197d26df0e93bbc1ec5763ce.sharedhex
